@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perpetuuiti Technosoft | AI Interview Platform</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    :root {
+      --gold: #c9a84c;
+      --gold-dim: rgba(201,168,76,0.18);
+      --gold-glow: rgba(201,168,76,0.08);
+      --bg-deep: #0b0c14;
+      --bg-card: #12142099;
+      --bg-panel: #1a1c2e;
+      --text-cream: #f0e6d2;
+      --text-muted: rgba(240,230,210,0.45);
+      --text-mid: rgba(240,230,210,0.75);
+      --border: rgba(255,255,255,0.06);
+      --border-gold: rgba(201,168,76,0.3);
+      --shadow: 0 30px 60px -12px rgba(0,0,0,0.5);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg-deep);
+      background-image:
+        radial-gradient(ellipse 80% 50% at 10% 0%, rgba(26,28,46,0.9) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 90% 80%, rgba(201,168,76,0.04) 0%, transparent 60%);
+      color: var(--text-cream);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Noise grain overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ── App layout ── */
+    .app {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      min-height: 100vh;
+    }
+
+    /* ══════════════════════════════
+       SIDEBAR
+    ══════════════════════════════ */
+    .sidebar {
+      background: linear-gradient(180deg, #12142a 0%, #0e1020 100%);
+      border-right: 1px solid var(--border);
+      padding: 36px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sidebar::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 1px; height: 100%;
+      background: linear-gradient(180deg, var(--gold) 0%, transparent 60%);
+      opacity: 0.4;
+    }
+
+    /* Brand */
+    .brand {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-bottom: 36px;
+    }
+
+    /* brand-mark replaced by SVG emblem */
+
+    .brand h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--text-cream);
+      letter-spacing: 0.01em;
+      margin-bottom: 6px;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .brand p {
+      color: var(--text-muted);
+      font-size: 13px;
+      line-height: 1.85;
+    }
+
+    /* Gold divider */
+    .gold-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 28px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gold-divider::after {
+      content: '';
+      position: absolute;
+      left: 0; top: 0;
+      height: 100%;
+      width: 60%;
+      background: linear-gradient(90deg, var(--gold), transparent);
+      opacity: 0.6;
+    }
+
+    /* Menu cards */
+    .menu { display: flex; flex-direction: column; gap: 14px; }
+
+    .menu-card {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 20px;
+      transition: border-color 0.3s ease, background 0.3s ease;
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .menu-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--gold-glow), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .menu-card:hover { border-color: var(--border-gold); }
+    .menu-card:hover::before { opacity: 1; }
+
+    .menu-card-icon {
+      width: 32px; height: 32px;
+      border: 1px solid var(--border-gold);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .menu-card h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-cream);
+      letter-spacing: 0.02em;
+      margin-bottom: 6px;
+    }
+
+    .menu-card p {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* Sidebar footer */
+    .sidebar-footer {
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 12px;
+      letter-spacing: 0.02em;
+    }
+
+    .sidebar-footer strong { color: var(--gold); font-weight: 500; }
+
+    /* ══════════════════════════════
+       MAIN CONTENT
+    ══════════════════════════════ */
+    .main {
+      padding: 36px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .topbar-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 34px;
+      font-weight: 700;
+      color: var(--text-cream);
+      letter-spacing: -0.5px;
+    }
+
+    .topbar-sub {
+      font-size: 12px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-top: 6px;
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 10px 18px;
+    }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 8px rgba(239,68,68,0.6);
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+
+    .status-dot.active {
+      background: #10b981;
+      box-shadow: 0 0 8px rgba(16,185,129,0.6);
+    }
+
+    #status {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-mid);
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(145deg, #1a1c2e 0%, #141628 100%);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, rgba(201,168,76,0.07), transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Corner accents on hero */
+    .hero-corner {
+      position: absolute;
+      width: 32px; height: 32px;
+      border-color: var(--gold);
+      border-style: solid;
+      opacity: 0.5;
+    }
+
+    .hero-corner-tl { top: 16px; left: 16px; border-width: 2px 0 0 2px; border-radius: 6px 0 0 0; }
+    .hero-corner-br { bottom: 16px; right: 16px; border-width: 0 2px 2px 0; border-radius: 0 0 6px 0; }
+
+    .hero-eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 18px;
+    }
+
+    .hero h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 30px;
+      font-weight: 600;
+      line-height: 1.25;
+      color: var(--text-cream);
+      margin-bottom: 20px;
+      letter-spacing: 0.01em;
+    }
+
+    .hero h3 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.9;
+      max-width: 560px;
+    }
+
+    .btn-row { margin-top: 32px; display: flex; align-items: center; gap: 16px; }
+
+    #recordBtn {
+      border: 1px solid var(--gold);
+      outline: none;
+      cursor: pointer;
+      background: transparent;
+      color: var(--gold);
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    }
+
+    #recordBtn:hover {
+      background: var(--gold);
+      color: #0b0c14;
+      box-shadow: 0 12px 32px rgba(201,168,76,0.25);
+      transform: translateY(-2px);
+    }
+
+    #recordBtn.recording {
+      background: rgba(220,38,38,0.15);
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+
+    #recordBtn.recording:hover {
+      background: #ef4444;
+      color: #fff;
+      box-shadow: 0 12px 32px rgba(239,68,68,0.25);
+    }
+
+    .session-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Analytics row ── */
+    .analytics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .analytics-card {
+      background: linear-gradient(145deg, #1a1c2e 0%, #141628 100%);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px 26px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s ease;
+    }
+
+    .analytics-card:hover { border-color: var(--border-gold); }
+
+    .analytics-card-label {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .analytics-card-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--text-cream);
+      line-height: 1;
+    }
+
+    .analytics-card-note {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--gold);
+      letter-spacing: 0.05em;
+    }
+
+    .analytics-bar {
+      position: absolute;
+      bottom: 0; left: 0;
+      height: 2px;
+      width: 0;
+      background: linear-gradient(90deg, var(--gold), transparent);
+      transition: width 1.2s cubic-bezier(0.23,1,0.32,1);
+    }
+
+    .analytics-card:hover .analytics-bar { width: 100%; }
+
+    /* ── Chat Grid ── */
+    .chat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+    }
+
+    .chat-card {
+      background: linear-gradient(145deg, #1a1c2e 0%, #141628 100%);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 28px 30px;
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.4s ease;
+    }
+
+    .chat-card:hover { border-color: var(--border-gold); }
+
+    /* Corner accents on chat cards */
+    .card-corner {
+      position: absolute;
+      width: 22px; height: 22px;
+      border-color: var(--gold);
+      border-style: solid;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .card-corner-tl { top: 12px; left: 12px; border-width: 2px 0 0 2px; border-radius: 4px 0 0 0; }
+    .card-corner-br { bottom: 12px; right: 12px; border-width: 0 2px 2px 0; border-radius: 0 0 4px 0; }
+    .chat-card:hover .card-corner { opacity: 1; }
+
+    .chat-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .chat-card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text-cream);
+    }
+
+    .badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid;
+    }
+
+    .badge-candidate {
+      color: var(--gold);
+      border-color: var(--border-gold);
+      background: var(--gold-glow);
+    }
+
+    .badge-hr {
+      color: rgba(240,230,210,0.6);
+      border-color: var(--border);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .chat-card-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 14px 0 18px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .chat-card-divider-fill {
+      position: absolute;
+      left: 0; top: 0;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--gold), transparent);
+      transition: width 0.6s cubic-bezier(0.23,1,0.32,1) 0.05s;
+    }
+
+    .chat-card:hover .chat-card-divider-fill { width: 100%; }
+
+    .chat-content {
+      flex: 1;
+      overflow-y: auto;
+      font-size: 14px;
+      line-height: 2;
+      color: var(--text-mid);
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-gold) transparent;
+    }
+
+    .chat-content::-webkit-scrollbar { width: 4px; }
+    .chat-content::-webkit-scrollbar-thumb { background: var(--border-gold); border-radius: 4px; }
+
+    /* ── Loading dots ── */
+    #loading { display: none; margin-top: 18px; }
+
+    .loader { display: flex; gap: 7px; align-items: center; }
+
+    .loader span {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      opacity: 0.3;
+      animation: blink 1.2s ease-in-out infinite;
+    }
+
+    .loader span:nth-child(2) { animation-delay: 0.2s; }
+    .loader span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes blink {
+      0%, 100% { opacity: 0.2; transform: translateY(0); }
+      50% { opacity: 1; transform: translateY(-4px); }
+    }
+
+    /* ── Hero platform title (professional serif) ── */
+    .hero-platform-title {
+      display: block;
+      font-family: 'Cormorant Garamond', 'Georgia', serif;
+      font-size: 52px;
+      font-weight: 300;
+      font-style: italic;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      line-height: 1.1;
+      margin-top: 4px;
+      /* Refined engraving effect */
+      text-shadow:
+        0 1px 0 rgba(0,0,0,0.5),
+        0 0 40px rgba(201,168,76,0.2);
+    }
+
+    /* ── Brand emblem SVG ── */
+    .brand-mark-svg {
+      transition: transform 0.6s cubic-bezier(0.23,1,0.32,1), filter 0.4s ease;
+      filter: drop-shadow(0 0 6px rgba(201,168,76,0.0));
+    }
+
+    .brand-mark-svg:hover {
+      transform: scale(1.06) rotate(3deg);
+      filter: drop-shadow(0 0 12px rgba(201,168,76,0.4));
+    }
+
+
+    /* ══════════════════════════════
+       SPEAKING STATE ANIMATIONS
+    ══════════════════════════════ */
+
+    .card-speaking {
+      transform: translateY(-10px) scale(1.012) !important;
+      border-color: rgba(201,168,76,0.55) !important;
+      box-shadow:
+        0 28px 64px -8px rgba(201,168,76,0.22),
+        0 0 0 1px rgba(201,168,76,0.25),
+        inset 0 1px 0 rgba(201,168,76,0.12) !important;
+      transition:
+        transform 0.6s cubic-bezier(0.23,1,0.32,1),
+        border-color 0.4s ease,
+        box-shadow 0.5s ease !important;
+    }
+
+    .card-passive {
+      transform: translateY(2px) scale(0.99) !important;
+      border-color: rgba(255,255,255,0.03) !important;
+      box-shadow: none !important;
+      opacity: 0.68;
+      transition:
+        transform 0.6s cubic-bezier(0.23,1,0.32,1),
+        border-color 0.4s ease,
+        box-shadow 0.5s ease,
+        opacity 0.4s ease !important;
+    }
+
+    .card-speaking .card-corner {
+      opacity: 1 !important;
+      filter: drop-shadow(0 0 5px rgba(201,168,76,0.7));
+    }
+
+    /* Divider shimmer sweep */
+    .card-speaking .chat-card-divider-fill {
+      width: 100% !important;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(201,168,76,0.25) 20%,
+        #c9a84c 48%,
+        #f0d480 54%,
+        #c9a84c 60%,
+        rgba(201,168,76,0.25) 80%,
+        transparent 100%
+      );
+      background-size: 220% 100%;
+      animation: divider-shimmer 1.6s ease-in-out infinite;
+    }
+
+    @keyframes divider-shimmer {
+      0%   { background-position: 130% 0; }
+      100% { background-position: -130% 0; }
+    }
+
+    .card-speaking .badge {
+      animation: badge-pulse 1.6s ease-in-out infinite;
+    }
+
+    @keyframes badge-pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.45; }
+    }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 1100px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { border-right: none; border-bottom: 1px solid var(--border); padding: 28px; }
+      .sidebar::after { display: none; }
+      .menu { flex-direction: row; flex-wrap: wrap; }
+      .menu-card { flex: 1; min-width: 200px; }
+    }
+
+    @media (max-width: 860px) {
+      .chat-grid { grid-template-columns: 1fr; }
+      .analytics { grid-template-columns: 1fr; }
+      .topbar { flex-direction: column; gap: 18px; }
+    }
+
+    @media (max-width: 640px) {
+      .main { padding: 24px 20px; }
+      .hero { padding: 28px 24px; }
+      .hero h3 { font-size: 28px; }
+      #recordBtn { width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app">
+
+    <!-- ════════ SIDEBAR ════════ -->
+    <aside class="sidebar">
+
+      <div>
+        <!-- Brand -->
+        <div class="brand">
+          <!-- Vintage PT emblem -->
+          <svg class="brand-mark-svg" width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:20px;">
+            <!-- Outer ring -->
+            <circle cx="36" cy="36" r="34" stroke="#c9a84c" stroke-width="1" stroke-dasharray="3 2" opacity="0.5"/>
+            <!-- Inner ring -->
+            <circle cx="36" cy="36" r="28" stroke="#c9a84c" stroke-width="0.75" opacity="0.3"/>
+            <!-- Shield shape -->
+            <path d="M36 12 L54 20 L54 38 Q54 54 36 62 Q18 54 18 38 L18 20 Z"
+                  fill="rgba(201,168,76,0.06)" stroke="#c9a84c" stroke-width="1.2" stroke-linejoin="round"/>
+            <!-- Inner shield line -->
+            <path d="M36 16 L50 22.5 L50 38 Q50 51 36 58 Q22 51 22 38 L22 22.5 Z"
+                  fill="none" stroke="#c9a84c" stroke-width="0.5" stroke-linejoin="round" opacity="0.35"/>
+            <!-- P letter -->
+            <text x="23" y="43" font-family="'Playfair Display', Georgia, serif" font-size="18" font-weight="700" fill="#c9a84c" letter-spacing="-1">P</text>
+            <!-- T letter -->
+            <text x="36" y="43" font-family="'Playfair Display', Georgia, serif" font-size="18" font-weight="700" fill="#c9a84c" letter-spacing="0">T</text>
+            <!-- Top ornament -->
+            <path d="M30 13.5 Q36 10 42 13.5" stroke="#c9a84c" stroke-width="0.8" fill="none" opacity="0.6"/>
+            <!-- Bottom ornament dots -->
+            <circle cx="36" cy="63" r="1.2" fill="#c9a84c" opacity="0.5"/>
+            <circle cx="31" cy="61.5" r="0.8" fill="#c9a84c" opacity="0.3"/>
+            <circle cx="41" cy="61.5" r="0.8" fill="#c9a84c" opacity="0.3"/>
+            <!-- Side serifs -->
+            <line x1="10" y1="36" x2="15" y2="36" stroke="#c9a84c" stroke-width="0.75" opacity="0.4"/>
+            <line x1="57" y1="36" x2="62" y2="36" stroke="#c9a84c" stroke-width="0.75" opacity="0.4"/>
+          </svg>
+          <h1>Perpetuuiti<br>Technosoft</h1>
+          <p class="brand-sub">Enterprise AI Platform</p>
+          <p>
+            Intelligent voice-driven interview platform built
+            for modern hiring, candidate evaluation and
+            HR automation at enterprise scale.
+          </p>
+        </div>
+
+        <!-- Divider -->
+        <div class="gold-divider"></div>
+
+        <!-- Menu -->
+        <div class="menu">
+
+          <div class="menu-card">
+            <div class="menu-card-icon">
+              <i data-lucide="mic" style="width:15px;height:15px;color:var(--gold);"></i>
+            </div>
+            <h3>AI Voice Conversation</h3>
+            <p>Real-time conversational AI with advanced speech processing and natural dialogue flow.</p>
+          </div>
+
+          <div class="menu-card">
+            <div class="menu-card-icon">
+              <i data-lucide="brain" style="width:15px;height:15px;color:var(--gold);"></i>
+            </div>
+            <h3>Candidate Intelligence</h3>
+            <p>Analyze communication, speaking confidence and responses using AI-driven evaluation.</p>
+          </div>
+
+          <div class="menu-card">
+            <div class="menu-card-icon">
+              <i data-lucide="layers" style="width:15px;height:15px;color:var(--gold);"></i>
+            </div>
+            <h3>Enterprise Ready</h3>
+            <p>Production-grade architecture designed for scalable enterprise HR workflows.</p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="sidebar-footer">
+        Powered by <strong>Perpetuuiti AI Platform</strong>
+      </div>
+
+    </aside>
+
+    <!-- ════════ MAIN ════════ -->
+    <main class="main">
+
+      <!-- Topbar -->
+      <div class="topbar">
+        <div>
+          <div class="topbar-title">AI Interview Dashboard</div>
+          <div class="topbar-sub">Conversational HR Experience</div>
+        </div>
+        <div class="status-pill">
+          <div class="status-dot" id="statusDot"></div>
+          <div id="status">Disconnected</div>
+        </div>
+      </div>
+
+      <!-- Hero -->
+      <section class="hero">
+        <div class="hero-corner hero-corner-tl"></div>
+        <div class="hero-corner hero-corner-br"></div>
+
+        <div class="hero-eyebrow">— Bala HR Assistant &nbsp;·&nbsp; Live Session</div>
+
+        <h3>Intelligent Voice&#8202;&#8202;Based
+          <br>
+          <span class="hero-platform-title">HR Interview Platform</span>
+        </h3>
+
+        <p>
+          Start a real-time AI interview session powered by advanced speech
+          recognition, LLM reasoning, and human-like voice AI crafted to
+          evaluate candidates with precision and depth.
+        </p>
+
+        <div class="btn-row">
+          <button id="recordBtn">
+            <i data-lucide="circle" style="width:12px;height:12px;display:inline;vertical-align:middle;margin-right:8px;"></i>
+            Start Interview Session
+          </button>
+          <span class="session-hint">Press to begin &nbsp;·&nbsp; Voice-enabled</span>
+        </div>
+      </section>
+
+      <!-- Analytics -->
+      <div class="analytics">
+
+        <div class="analytics-card">
+          <div class="analytics-card-label">Sessions Today</div>
+          <div class="analytics-card-value">—</div>
+          <div class="analytics-card-note">Awaiting connection</div>
+          <div class="analytics-bar"></div>
+        </div>
+
+        <div class="analytics-card">
+          <div class="analytics-card-label">Avg. Duration</div>
+          <div class="analytics-card-value">—</div>
+          <div class="analytics-card-note">No data yet</div>
+          <div class="analytics-bar"></div>
+        </div>
+
+        <div class="analytics-card">
+          <div class="analytics-card-label">AI Accuracy</div>
+          <div class="analytics-card-value">—</div>
+          <div class="analytics-card-note">Session not started</div>
+          <div class="analytics-bar"></div>
+        </div>
+
+      </div>
+
+      <!-- Chat Grid -->
+      <div class="chat-grid">
+
+        <!-- Candidate -->
+        <div class="chat-card" id="candidateCard">
+          <div class="card-corner card-corner-tl"></div>
+          <div class="card-corner card-corner-br"></div>
+
+          <div class="chat-card-header">
+            <div class="chat-card-title">Candidate Transcript</div>
+            <div class="badge badge-candidate">Live Input</div>
+          </div>
+
+          <div class="chat-card-divider">
+            <div class="chat-card-divider-fill"></div>
+          </div>
+
+          <div class="chat-content" id="userText">
+            Waiting for candidate response...
+          </div>
+        </div>
+
+        <!-- HR AI -->
+        <div class="chat-card" id="aiCard">
+          <div class="card-corner card-corner-tl"></div>
+          <div class="card-corner card-corner-br"></div>
+
+          <div class="chat-card-header">
+            <div class="chat-card-title">HR AI Response</div>
+            <div class="badge badge-hr">AI Active</div>
+          </div>
+
+          <div class="chat-card-divider">
+            <div class="chat-card-divider-fill"></div>
+          </div>
+
+          <div class="chat-content" id="aiText">
+            Interview session not started.
+          </div>
+
+          <div id="loading">
+            <div class="loader">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    const candidateCard = document.getElementById('candidateCard');
+    const aiCard        = document.getElementById('aiCard');
+
+    // ── Status helper ──
+    function setStatus(label, active) {
+      document.getElementById('status').textContent = label;
+      document.getElementById('statusDot').classList.toggle('active', active);
+    }
+
+    // ── Speaking state controller ──
+    // speaker: 'candidate' | 'ai' | null
+    function setSpeaker(speaker) {
+      candidateCard.classList.remove('card-speaking', 'card-passive');
+      aiCard.classList.remove('card-speaking', 'card-passive');
+
+      if (speaker === 'candidate') {
+        candidateCard.classList.add('card-speaking');
+        aiCard.classList.add('card-passive');
+      } else if (speaker === 'ai') {
+        aiCard.classList.add('card-speaking');
+        candidateCard.classList.add('card-passive');
+      }
+      // null = both idle (no class)
+    }
+
+    // Expose so app.js can call: window.setSpeaker('ai') / window.setStatus(...)
+    window.setSpeaker = setSpeaker;
+    window.setStatus = setStatus;
+  </script>
+
+  <!-- External app.js wired in as before -->
+  <script src="app.js" onerror="void 0"></script>
+
+</body>
+</html>

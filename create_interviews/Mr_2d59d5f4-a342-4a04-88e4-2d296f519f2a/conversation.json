@@ -1,0 +1,51 @@
+{
+  "session_id": "2d59d5f4-a342-4a04-88e4-2d296f519f2a",
+  "candidate_name": "Mr",
+  "turns": [
+    {
+      "ts": 1778751313.047749,
+      "role": "assistant",
+      "text": "Hi, Bala here from Perpetuuiti Technosoft. Welcome! It's nice to meet you. I hope you're doing well today. Before we begin, could you please introduce yourself?"
+    },
+    {
+      "ts": 1778751342.7974138,
+      "role": "user",
+      "text": "My name is Mr."
+    },
+    {
+      "ts": 1778751356.9914124,
+      "role": "assistant",
+      "text": "Nice to meet you, Mr.! Can you start by telling me a little bit about why you're interested in this role at our company?"
+    },
+    {
+      "ts": 1778751388.8595648,
+      "role": "user",
+      "text": "I saw your company from, and you said in the page, you need a..."
+    },
+    {
+      "ts": 1778751390.0040865,
+      "role": "assistant",
+      "text": "(smiling) Ah, nice to meet you! I'm Bala, the HR interviewer. You must be referring to our careers page, where we listed a role that caught your eye? What was it that interested you about our company?"
+    },
+    {
+      "ts": 1778751403.4338043,
+      "role": "user",
+      "text": "He is like, can you perform?  Okay.  And I'll..."
+    },
+    {
+      "ts": 1778751404.760258,
+      "role": "assistant",
+      "text": "(laughs) Well, I think we got a bit of a different tone in there. Don't worry, we're not here to judge, we're here to have a conversation. So, let's start fresh. Can you tell me, what makes you think you'd be a good fit for this role?"
+    },
+    {
+      "ts": 1778751422.727888,
+      "role": "user",
+      "text": "and we have a lot of work to do.  We have a lot of work to do.  We have a lot of work to do."
+    },
+    {
+      "ts": 1778751423.9923148,
+      "role": "assistant",
+      "text": "(laughs warmly) Ah, I think I understand what you're trying to say! You're enthusiastic about the workload, but perhaps a bit... repetitive? Can you tell me, what do you think is the most challenging aspect of this workload, and how do you plan to tackle it?"
+    }
+  ]
+}
